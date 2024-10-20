@@ -255,19 +255,26 @@ print_summary(timeline, "cleaned timeline")
 
 ## Saving Cleaned and Formatted Data
 
-Finally, we'll save our cleaned datasets:
+Finally, we'll save our cleaned and formatted datasets:
 
 ```{r save-data}
 #| label: save-data
 #| code-fold: false
 
-dir.create("cleaned_data", showWarnings = FALSE)
+# Create DataCleanAndFormatted directory
+dir.create("DataCleanAndFormatted", showWarnings = FALSE)
 
-write_csv(country_results, "cleaned_data/cleaned_country_results.csv")
-write_csv(individual_results, "cleaned_data/cleaned_individual_results.csv")
-write_csv(timeline, "cleaned_data/cleaned_timeline.csv")
+# Save cleaned CSV files
+write_csv(country_results, "DataCleanAndFormatted/cleaned_country_results.csv")
+write_csv(individual_results, "DataCleanAndFormatted/cleaned_individual_results.csv")
+write_csv(timeline, "DataCleanAndFormatted/cleaned_timeline.csv")
 
-print("Data cleaning and formatting completed. Please check the generated cleaned CSV files in the 'cleaned_data' directory.")
+# Save formatted RDS files
+saveRDS(country_results, "DataCleanAndFormatted/formatted_country_results.rds")
+saveRDS(individual_results, "DataCleanAndFormatted/formatted_individual_results.rds")
+saveRDS(timeline, "DataCleanAndFormatted/formatted_timeline.rds")
+
+print("Data cleaning and formatting completed. Please check the generated files in the 'DataCleanAndFormatted' directory.")
 ```
 
 ## Conclusion
