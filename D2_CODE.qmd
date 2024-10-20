@@ -1,12 +1,11 @@
 ---
 title: "IMO Data Cleaning and Formatting"
-author: "Zhongyue Lin"
+author: "Your Name"
 date: "`r Sys.Date()`"
-format:
-  html:
+output:
+  html_document:
     toc: true
-    toc-depth: 3
-    code-fold: show
+    toc_depth: 3
     theme: cosmo
 ---
 
