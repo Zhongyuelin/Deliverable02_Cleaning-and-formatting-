@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Zhongyue Lin">
-<meta name="dcterms.date" content="2024-10-11">
+<meta name="dcterms.date" content="2024-10-20">
 
 <title>IMO Data Cleaning and Formatting</title>
 <style>
@@ -124,7 +124,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 11, 2024</p>
+      <p class="date">October 20, 2024</p>
     </div>
   </div>
   
@@ -409,17 +409,24 @@ Duplicate rows in cleaned timeline : 0 </code></pre>
 </section>
 <section id="saving-cleaned-and-formatted-data" class="level2">
 <h2 class="anchored" data-anchor-id="saving-cleaned-and-formatted-data">Saving Cleaned and Formatted Data</h2>
-<p>Finally, we’ll save our cleaned datasets:</p>
+<p>Finally, we’ll save our cleaned and formatted datasets:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">"cleaned_data"</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(country_results, <span class="st">"cleaned_data/cleaned_country_results.csv"</span>)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(individual_results, <span class="st">"cleaned_data/cleaned_individual_results.csv"</span>)</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(timeline, <span class="st">"cleaned_data/cleaned_timeline.csv"</span>)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Data cleaning and formatting completed. Please check the generated cleaned CSV files in the 'cleaned_data' directory."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create DataCleanAndFormatted directory</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">"DataCleanAndFormatted"</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Save cleaned CSV files</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(country_results, <span class="st">"DataCleanAndFormatted/cleaned_country_results.csv"</span>)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(individual_results, <span class="st">"DataCleanAndFormatted/cleaned_individual_results.csv"</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(timeline, <span class="st">"DataCleanAndFormatted/cleaned_timeline.csv"</span>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Save formatted RDS files</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(country_results, <span class="st">"DataCleanAndFormatted/formatted_country_results.rds"</span>)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(individual_results, <span class="st">"DataCleanAndFormatted/formatted_individual_results.rds"</span>)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(timeline, <span class="st">"DataCleanAndFormatted/formatted_timeline.rds"</span>)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Data cleaning and formatting completed. Please check the generated files in the 'DataCleanAndFormatted' directory."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "Data cleaning and formatting completed. Please check the generated cleaned CSV files in the 'cleaned_data' directory."</code></pre>
+<pre><code>[1] "Data cleaning and formatting completed. Please check the generated files in the 'DataCleanAndFormatted' directory."</code></pre>
 </div>
 </div>
 </section>
