@@ -6,8 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Your Name">
-<meta name="dcterms.date" content="2024-10-20">
+<meta name="author" content="Zhongyue Lin">
+<meta name="dcterms.date" content="2024-10-21">
 
 <title>IMO Data Cleaning and Formatting</title>
 <style>
@@ -117,14 +117,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Your Name </p>
+             <p>Zhongyue Lin </p>
           </div>
   </div>
     
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">October 20, 2024</p>
+      <p class="date">October 21, 2024</p>
     </div>
   </div>
   
@@ -134,72 +134,90 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
+<div class="cell">
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load necessary libraries</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>This document outlines the process of cleaning and formatting the International Mathematical Olympiad (IMO) data. We will be working with three datasets:</p>
-<ol type="1">
-<li><code>country_results.csv</code>: Results by country</li>
-<li><code>individual_results.csv</code>: Individual participant results</li>
-<li><code>timeline.csv</code>: IMO timeline information</li>
-</ol>
-<p>Our goal is to clean these datasets, handle missing values and outliers, ensure data consistency, and prepare the data for further analysis.</p>
+<p>This document outlines the process of cleaning and formatting the International Mathematical Olympiad (IMO) data. We will be working with three datasets: country results, individual results, and timeline information.</p>
 </section>
 <section id="data-import" class="level2">
 <h2 class="anchored" data-anchor-id="data-import">Data Import</h2>
-<p>We’ll create a custom function to read the data with appropriate column types based on the data dictionary.</p>
+<p>We’ll create a custom function to read the data from the GitHub repository of Deliverable #1.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>read_imo_data <span class="ot">&lt;-</span> <span class="cf">function</span>(file_name, integer_cols, character_cols, <span class="at">date_cols =</span> <span class="fu">c</span>()) {</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  col_types <span class="ot">&lt;-</span> <span class="fu">cols</span>(<span class="at">.default =</span> <span class="fu">col_double</span>())</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  col_types<span class="sc">$</span>cols[integer_cols] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">col_integer</span>())</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  col_types<span class="sc">$</span>cols[character_cols] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">col_character</span>())</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  col_types<span class="sc">$</span>cols[date_cols] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">col_date</span>())</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_csv</span>(<span class="fu">file.path</span>(data_path, file_name), <span class="at">col_types =</span> col_types)</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>read_imo_data <span class="ot">&lt;-</span> <span class="cf">function</span>(file_name, integer_cols, character_cols, <span class="at">date_cols =</span> <span class="fu">c</span>()) {</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  col_types <span class="ot">&lt;-</span> <span class="fu">cols</span>(<span class="at">.default =</span> <span class="fu">col_double</span>())</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  col_types<span class="sc">$</span>cols[integer_cols] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">col_integer</span>())</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  col_types<span class="sc">$</span>cols[character_cols] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">col_character</span>())</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  col_types<span class="sc">$</span>cols[date_cols] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">col_date</span>())</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Construct URL for raw data in GitHub repository</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  url <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"https://raw.githubusercontent.com/Zhongyuelin/Deliverable01-Collecting-raw-data-/main/IMO_data/"</span>, file_name)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_csv</span>(url, <span class="at">col_types =</span> col_types)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>Now, let’s read in our datasets:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read country results data</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"country_results.csv"</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"team_size_all"</span>, <span class="st">"team_size_male"</span>, <span class="st">"team_size_female"</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span>, <span class="st">"p5"</span>, <span class="st">"p6"</span>,</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"awards_gold"</span>, <span class="st">"awards_silver"</span>, <span class="st">"awards_bronze"</span>, <span class="st">"awards_honorable_mentions"</span>),</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"country"</span>, <span class="st">"leader"</span>, <span class="st">"deputy_leader"</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Read individual results data</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"individual_results.csv"</span>,</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span>, <span class="st">"p5"</span>, <span class="st">"p6"</span>, <span class="st">"total"</span>, <span class="st">"individual_rank"</span>),</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"contestant"</span>, <span class="st">"country"</span>, <span class="st">"award"</span>)</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Read timeline data</span></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">"timeline.csv"</span>,</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"edition"</span>, <span class="st">"year"</span>, <span class="st">"countries"</span>, <span class="st">"all_contestant"</span>, <span class="st">"male_contestant"</span>, <span class="st">"female_contestant"</span>),</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"country"</span>, <span class="st">"city"</span>),</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">date_cols =</span> <span class="fu">c</span>(<span class="st">"start_date"</span>, <span class="st">"end_date"</span>)</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read country results data</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"country_results.csv"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"team_size_all"</span>, <span class="st">"team_size_male"</span>, <span class="st">"team_size_female"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span>, <span class="st">"p5"</span>, <span class="st">"p6"</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"awards_gold"</span>, <span class="st">"awards_silver"</span>, <span class="st">"awards_bronze"</span>, <span class="st">"awards_honorable_mentions"</span>),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"country"</span>, <span class="st">"leader"</span>, <span class="st">"deputy_leader"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Read individual results data</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"individual_results.csv"</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"year"</span>, <span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span>, <span class="st">"p5"</span>, <span class="st">"p6"</span>, <span class="st">"total"</span>, <span class="st">"individual_rank"</span>),</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"contestant"</span>, <span class="st">"country"</span>, <span class="st">"award"</span>)</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Read timeline data</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> <span class="fu">read_imo_data</span>(</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">"timeline.csv"</span>,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">integer_cols =</span> <span class="fu">c</span>(<span class="st">"edition"</span>, <span class="st">"year"</span>, <span class="st">"countries"</span>, <span class="st">"all_contestant"</span>, <span class="st">"male_contestant"</span>, <span class="st">"female_contestant"</span>),</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">character_cols =</span> <span class="fu">c</span>(<span class="st">"country"</span>, <span class="st">"city"</span>),</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">date_cols =</span> <span class="fu">c</span>(<span class="st">"start_date"</span>, <span class="st">"end_date"</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 <section id="initial-data-exploration" class="level2">
 <h2 class="anchored" data-anchor-id="initial-data-exploration">Initial Data Exploration</h2>
 <p>Let’s create a function to print summary statistics for each dataset:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>print_summary <span class="ot">&lt;-</span> <span class="cf">function</span>(df, name) {</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Summary for"</span>, name, <span class="st">":</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="fu">summary</span>(df), <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">"Summary of"</span>, name))</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Missing values in"</span>, name, <span class="st">":</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="fu">data.frame</span>(<span class="at">Column =</span> <span class="fu">names</span>(df), <span class="at">Missing =</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(df))), <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">"Missing values in"</span>, name))</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Structure of"</span>, name, <span class="st">":</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="fu">data.frame</span>(<span class="at">Column =</span> <span class="fu">names</span>(df), <span class="at">Class =</span> <span class="fu">sapply</span>(df, class)), <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">"Structure of"</span>, name))</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Duplicate rows in"</span>, name, <span class="st">":"</span>, <span class="fu">sum</span>(<span class="fu">duplicated</span>(df)), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>print_summary <span class="ot">&lt;-</span> <span class="cf">function</span>(df, name) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Summary for"</span>, name, <span class="st">":</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="fu">summary</span>(df), <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">"Summary of"</span>, name))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Missing values in"</span>, name, <span class="st">":</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="fu">data.frame</span>(<span class="at">Column =</span> <span class="fu">names</span>(df), <span class="at">Missing =</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(df))), <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">"Missing values in"</span>, name))</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Structure of"</span>, name, <span class="st">":</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(<span class="fu">data.frame</span>(<span class="at">Column =</span> <span class="fu">names</span>(df), <span class="at">Class =</span> <span class="fu">sapply</span>(df, class)), <span class="at">caption =</span> <span class="fu">paste</span>(<span class="st">"Structure of"</span>, name))</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">Duplicate rows in"</span>, name, <span class="st">":"</span>, <span class="fu">sum</span>(<span class="fu">duplicated</span>(df)), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <p>Now, let’s examine our data:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(country_results, <span class="st">"country_results"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(country_results, <span class="st">"country_results"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Summary for country_results :
@@ -210,7 +228,10 @@ Structure of country_results :
 
 Duplicate rows in country_results : 0 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(individual_results, <span class="st">"individual_results"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(individual_results, <span class="st">"individual_results"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Summary for individual_results :
@@ -221,7 +242,10 @@ Structure of individual_results :
 
 Duplicate rows in individual_results : 0 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(timeline, <span class="st">"timeline"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(timeline, <span class="st">"timeline"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Summary for timeline :
@@ -240,43 +264,51 @@ Duplicate rows in timeline : 0 </code></pre>
 <section id="handling-missing-values" class="level3">
 <h3 class="anchored" data-anchor-id="handling-missing-values">Handling Missing Values</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>handle_missing <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(.), <span class="fu">median</span>(., <span class="at">na.rm =</span> <span class="cn">TRUE</span>), .)))</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> <span class="fu">handle_missing</span>(country_results)</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> <span class="fu">handle_missing</span>(individual_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>handle_missing <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">ifelse</span>(<span class="fu">is.na</span>(.), <span class="fu">median</span>(., <span class="at">na.rm =</span> <span class="cn">TRUE</span>), .)))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> <span class="fu">handle_missing</span>(country_results)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> <span class="fu">handle_missing</span>(individual_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 <section id="removing-duplicate-rows" class="level3">
 <h3 class="anchored" data-anchor-id="removing-duplicate-rows">Removing Duplicate Rows</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> <span class="fu">distinct</span>(country_results)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> <span class="fu">distinct</span>(individual_results)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> <span class="fu">distinct</span>(timeline)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> <span class="fu">distinct</span>(country_results)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> <span class="fu">distinct</span>(individual_results)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> <span class="fu">distinct</span>(timeline)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 <section id="handling-outliers" class="level3">
 <h3 class="anchored" data-anchor-id="handling-outliers">Handling Outliers</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>handle_outliers <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.numeric</span>(x) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">all</span>(x <span class="sc">%%</span> <span class="dv">1</span> <span class="sc">==</span> <span class="dv">0</span>)) {  <span class="co"># Only for non-integer numeric columns</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    qnt <span class="ot">&lt;-</span> <span class="fu">quantile</span>(x, <span class="at">probs=</span><span class="fu">c</span>(.<span class="dv">25</span>, .<span class="dv">75</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    H <span class="ot">&lt;-</span> <span class="fl">1.5</span> <span class="sc">*</span> <span class="fu">IQR</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    x[x <span class="sc">&lt;</span> (qnt[<span class="dv">1</span>] <span class="sc">-</span> H)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    x[x <span class="sc">&gt;</span> (qnt[<span class="dv">2</span>] <span class="sc">+</span> H)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x)</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>problem_cols_country <span class="ot">&lt;-</span> <span class="fu">intersect</span>(<span class="fu">c</span>(<span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span>, <span class="st">"p5"</span>, <span class="st">"p6"</span>), <span class="fu">names</span>(country_results))</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> country_results <span class="sc">%&gt;%</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(problem_cols_country), handle_outliers))</span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>problem_cols_individual <span class="ot">&lt;-</span> <span class="fu">intersect</span>(<span class="fu">c</span>(<span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span>, <span class="st">"p5"</span>, <span class="st">"p6"</span>, <span class="st">"total"</span>), <span class="fu">names</span>(individual_results))</span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> individual_results <span class="sc">%&gt;%</span></span>
-<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(problem_cols_individual), handle_outliers))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>handle_outliers <span class="ot">&lt;-</span> <span class="cf">function</span>(x) {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.numeric</span>(x) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">all</span>(x <span class="sc">%%</span> <span class="dv">1</span> <span class="sc">==</span> <span class="dv">0</span>)) {  <span class="co"># Only for non-integer numeric columns</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    qnt <span class="ot">&lt;-</span> <span class="fu">quantile</span>(x, <span class="at">probs=</span><span class="fu">c</span>(.<span class="dv">25</span>, .<span class="dv">75</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    H <span class="ot">&lt;-</span> <span class="fl">1.5</span> <span class="sc">*</span> <span class="fu">IQR</span>(x, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    x[x <span class="sc">&lt;</span> (qnt[<span class="dv">1</span>] <span class="sc">-</span> H)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    x[x <span class="sc">&gt;</span> (qnt[<span class="dv">2</span>] <span class="sc">+</span> H)] <span class="ot">&lt;-</span> <span class="cn">NA</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(x)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>problem_cols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"p1"</span>, <span class="st">"p2"</span>, <span class="st">"p3"</span>, <span class="st">"p4"</span>, <span class="st">"p5"</span>, <span class="st">"p6"</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> country_results <span class="sc">%&gt;%</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(problem_cols), handle_outliers))</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> individual_results <span class="sc">%&gt;%</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(<span class="fu">all_of</span>(problem_cols), <span class="st">"total"</span>), handle_outliers))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 </section>
@@ -286,39 +318,48 @@ Duplicate rows in timeline : 0 </code></pre>
 <section id="ensuring-correct-data-types" class="level3">
 <h3 class="anchored" data-anchor-id="ensuring-correct-data-types">Ensuring Correct Data Types</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> country_results <span class="sc">%&gt;%</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(year, team_size_all, team_size_male, team_size_female,</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">all_of</span>(problem_cols_country),</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                  awards_gold, awards_silver, awards_bronze, awards_honorable_mentions), as.integer))</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> individual_results <span class="sc">%&gt;%</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(year, <span class="fu">all_of</span>(problem_cols_individual), total, individual_rank), as.integer))</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> timeline <span class="sc">%&gt;%</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(edition, year, countries, all_contestant, male_contestant, female_contestant), as.integer))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> country_results <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(year, team_size_all, team_size_male, team_size_female,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">all_of</span>(problem_cols),</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                  awards_gold, awards_silver, awards_bronze, awards_honorable_mentions), as.integer))</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> individual_results <span class="sc">%&gt;%</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(year, <span class="fu">all_of</span>(problem_cols), total, individual_rank), as.integer))</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> timeline <span class="sc">%&gt;%</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(edition, year, countries, all_contestant, male_contestant, female_contestant), as.integer))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 <section id="standardizing-variable-names" class="level3">
 <h3 class="anchored" data-anchor-id="standardizing-variable-names">Standardizing Variable Names</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>standardize_names <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(df) <span class="ot">&lt;-</span> <span class="fu">make.names</span>(<span class="fu">tolower</span>(<span class="fu">names</span>(df)), <span class="at">unique =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> <span class="fu">standardize_names</span>(country_results)</span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> <span class="fu">standardize_names</span>(individual_results)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> <span class="fu">standardize_names</span>(timeline)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>standardize_names <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(df) <span class="ot">&lt;-</span> <span class="fu">make.names</span>(<span class="fu">tolower</span>(<span class="fu">names</span>(df)), <span class="at">unique =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>country_results <span class="ot">&lt;-</span> <span class="fu">standardize_names</span>(country_results)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>individual_results <span class="ot">&lt;-</span> <span class="fu">standardize_names</span>(individual_results)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> <span class="fu">standardize_names</span>(timeline)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 <section id="ensuring-date-format-consistency" class="level3">
 <h3 class="anchored" data-anchor-id="ensuring-date-format-consistency">Ensuring Date Format Consistency</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> timeline <span class="sc">%&gt;%</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_date =</span> <span class="fu">as_date</span>(start_date),</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_date =</span> <span class="fu">as_date</span>(end_date)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>timeline <span class="ot">&lt;-</span> timeline <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">start_date =</span> <span class="fu">as_date</span>(start_date),</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">end_date =</span> <span class="fu">as_date</span>(end_date)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 </section>
 </section>
@@ -326,17 +367,20 @@ Duplicate rows in timeline : 0 </code></pre>
 <h2 class="anchored" data-anchor-id="data-consistency-checks">Data Consistency Checks</h2>
 <p>Let’s check the year ranges in our datasets to ensure consistency:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>year_ranges <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Dataset =</span> <span class="fu">c</span>(<span class="st">"country_results"</span>, <span class="st">"individual_results"</span>, <span class="st">"timeline"</span>),</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Min_Year =</span> <span class="fu">c</span>(<span class="fu">min</span>(country_results<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>               <span class="fu">min</span>(individual_results<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>               <span class="fu">min</span>(timeline<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Max_Year =</span> <span class="fu">c</span>(<span class="fu">max</span>(country_results<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>               <span class="fu">max</span>(individual_results<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>               <span class="fu">max</span>(timeline<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(year_ranges, <span class="at">caption =</span> <span class="st">"Year ranges across datasets"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>year_ranges <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Dataset =</span> <span class="fu">c</span>(<span class="st">"country_results"</span>, <span class="st">"individual_results"</span>, <span class="st">"timeline"</span>),</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Min_Year =</span> <span class="fu">c</span>(<span class="fu">min</span>(country_results<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>               <span class="fu">min</span>(individual_results<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>               <span class="fu">min</span>(timeline<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">Max_Year =</span> <span class="fu">c</span>(<span class="fu">max</span>(country_results<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>               <span class="fu">max</span>(individual_results<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>               <span class="fu">max</span>(timeline<span class="sc">$</span>year, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(year_ranges, <span class="at">caption =</span> <span class="st">"Year ranges across datasets"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output-display">
 <table class="table table-sm table-striped small">
 <caption>Year ranges across datasets</caption>
@@ -372,7 +416,10 @@ Duplicate rows in timeline : 0 </code></pre>
 <h2 class="anchored" data-anchor-id="final-data-summary">Final Data Summary</h2>
 <p>Let’s take a final look at our cleaned datasets:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(country_results, <span class="st">"cleaned country_results"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(country_results, <span class="st">"cleaned country_results"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Summary for cleaned country_results :
@@ -383,7 +430,10 @@ Structure of cleaned country_results :
 
 Duplicate rows in cleaned country_results : 0 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(individual_results, <span class="st">"cleaned individual_results"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(individual_results, <span class="st">"cleaned individual_results"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Summary for cleaned individual_results :
@@ -394,7 +444,10 @@ Structure of cleaned individual_results :
 
 Duplicate rows in cleaned individual_results : 0 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(timeline, <span class="st">"cleaned timeline"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print_summary</span>(timeline, <span class="st">"cleaned timeline"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Summary for cleaned timeline :
@@ -411,20 +464,23 @@ Duplicate rows in cleaned timeline : 0 </code></pre>
 <h2 class="anchored" data-anchor-id="saving-cleaned-and-formatted-data">Saving Cleaned and Formatted Data</h2>
 <p>Finally, we’ll save our cleaned and formatted datasets:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create DataCleanAndFormatted directory</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">"DataCleanAndFormatted"</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Save cleaned CSV files</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(country_results, <span class="st">"DataCleanAndFormatted/cleaned_country_results.csv"</span>)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(individual_results, <span class="st">"DataCleanAndFormatted/cleaned_individual_results.csv"</span>)</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(timeline, <span class="st">"DataCleanAndFormatted/cleaned_timeline.csv"</span>)</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Save formatted RDS files</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(country_results, <span class="st">"DataCleanAndFormatted/formatted_country_results.rds"</span>)</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(individual_results, <span class="st">"DataCleanAndFormatted/formatted_individual_results.rds"</span>)</span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(timeline, <span class="st">"DataCleanAndFormatted/formatted_timeline.rds"</span>)</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Data cleaning and formatting completed. Please check the generated files in the 'DataCleanAndFormatted' directory."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details open="">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create DataCleanAndFormatted directory</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="st">"DataCleanAndFormatted"</span>, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Save as CSV</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(country_results, <span class="st">"DataCleanAndFormatted/cleaned_country_results.csv"</span>)</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(individual_results, <span class="st">"DataCleanAndFormatted/cleaned_individual_results.csv"</span>)</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(timeline, <span class="st">"DataCleanAndFormatted/cleaned_timeline.csv"</span>)</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Save as RDS</span></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(country_results, <span class="st">"DataCleanAndFormatted/formatted_country_results.rds"</span>)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(individual_results, <span class="st">"DataCleanAndFormatted/formatted_individual_results.rds"</span>)</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="fu">saveRDS</span>(timeline, <span class="st">"DataCleanAndFormatted/formatted_timeline.rds"</span>)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Data cleaning and formatting completed. Please check the generated files in the 'DataCleanAndFormatted' directory."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Data cleaning and formatting completed. Please check the generated files in the 'DataCleanAndFormatted' directory."</code></pre>
 </div>
@@ -432,12 +488,12 @@ Duplicate rows in cleaned timeline : 0 </code></pre>
 </section>
 <section id="conclusion" class="level2">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>In this document, we have meticulously walked through the process of cleaning and formatting the International Mathematical Olympiad (IMO) datasets. Our approach was divided into two main phases: data cleaning and data formatting.</p>
-<p>In the data cleaning phase, we focused on improving the quality and integrity of the data. This included handling missing values through median imputation for numeric columns, which helped preserve the overall distribution of the data. We removed duplicate entries to ensure data uniqueness and addressed potential outliers in score columns using the Interquartile Range (IQR) method. This approach struck a balance between maintaining data integrity and respecting the unique nature of competition scores.</p>
-<p>The data formatting phase concentrated on standardizing the structure and presentation of the data. We ensured that all columns adhered to their correct data types as specified in the data dictionary, which is crucial for accurate analysis. Variable names were standardized across all datasets to maintain consistency and improve readability. In the timeline dataset, we paid special attention to date formats, ensuring temporal consistency which is vital for time-based analyses.</p>
-<p>Throughout both phases, we performed data consistency checks, with a particular focus on aligning year ranges across all three datasets. This step was crucial in validating the coherence of our data across different perspectives of the IMO competitions.</p>
-<p>The final step involved saving the cleaned and formatted data, preparing it for future analysis. This comprehensive process has not only prepared our IMO data for more in-depth analysis but also enhanced our understanding of the datasets’ characteristics and potential challenges. The resulting datasets now provide a solid foundation for exploring trends, patterns, and insights in International Mathematical Olympiad performances over the years.</p>
-<p>By clearly separating the cleaning and formatting steps, we’ve created a more structured and transparent data preprocessing workflow. This approach not only improves the clarity of our process but also allows for easier modifications or enhancements to specific aspects of data preparation in the future.</p>
+<p>In this document, we have meticulously walked through the process of cleaning and formatting the International Mathematical Olympiad (IMO) datasets. Our approach encompassed a comprehensive set of data preprocessing techniques, ensuring that the resulting datasets are clean, consistent, and well-structured for further analysis.</p>
+<p>We began by importing the data directly from the GitHub repository of Deliverable #1, ensuring that we’re working with the most up-to-date raw data. We then systematically addressed various data quality issues, including handling missing values, removing duplicates, and addressing potential outliers.</p>
+<p>In the formatting phase, we ensured that all columns adhered to their correct data types, standardized variable names across all datasets, and ensured temporal consistency in the timeline dataset.</p>
+<p>Throughout the process, we performed data consistency checks, with a particular focus on aligning year ranges across all three datasets. This step was crucial in validating the coherence of our data across different perspectives of the IMO competitions.</p>
+<p>The final step involved saving both cleaned (CSV) and formatted (RDS) versions of our datasets, preparing them for future analysis. This comprehensive process has not only prepared our IMO data for more in-depth analysis but also enhanced our understanding of the datasets’ characteristics and potential challenges.</p>
+<p>The resulting datasets now provide a solid foundation for exploring trends, patterns, and insights in International Mathematical Olympiad performances over the years.</p>
 </section>
 
 </main>

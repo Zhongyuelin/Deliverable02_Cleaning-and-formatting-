@@ -1,54 +1,44 @@
 ---
 title: "IMO Data Cleaning and Formatting"
-author: "Your Name"
+author: "Zhongyue Lin"
 date: "`r Sys.Date()`"
 format:
   html:
     toc: true
     toc-depth: 3
+    code-fold: show
     theme: cosmo
-    output-file: index.html
 ---
 
 ```{r setup, message=FALSE, warning=FALSE}
 #| label: setup
-#| include: false
 
+# Load necessary libraries
 library(tidyverse)
 library(lubridate)
 library(knitr)
-
-# Set working directory
-setwd("/Users/leo/Downloads/Deliverable02_Cleaning-and-formatting-")
-
-# Define the path to the raw data
-data_path <- "IMO_raw_data"
 ```
 
 ## Introduction
 
-This document outlines the process of cleaning and formatting the International Mathematical Olympiad (IMO) data. We will be working with three datasets:
-
-1. `country_results.csv`: Results by country
-2. `individual_results.csv`: Individual participant results
-3. `timeline.csv`: IMO timeline information
-
-Our goal is to clean these datasets, handle missing values and outliers, ensure data consistency, and prepare the data for further analysis.
+This document outlines the process of cleaning and formatting the International Mathematical Olympiad (IMO) data. We will be working with three datasets: country results, individual results, and timeline information.
 
 ## Data Import
 
-We'll create a custom function to read the data with appropriate column types based on the data dictionary.
+We'll create a custom function to read the data from the GitHub repository of Deliverable #1.
 
 ```{r data-import-function}
 #| label: data-import-function
-#| code-fold: false
 
 read_imo_data <- function(file_name, integer_cols, character_cols, date_cols = c()) {
   col_types <- cols(.default = col_double())
   col_types$cols[integer_cols] <- list(col_integer())
   col_types$cols[character_cols] <- list(col_character())
   col_types$cols[date_cols] <- list(col_date())
-  read_csv(file.path(data_path, file_name), col_types = col_types)
+  
+  # Construct URL for raw data in GitHub repository
+  url <- paste0("https://raw.githubusercontent.com/Zhongyuelin/Deliverable01-Collecting-raw-data-/main/IMO_data/", file_name)
+  read_csv(url, col_types = col_types)
 }
 ```
 
@@ -56,7 +46,6 @@ Now, let's read in our datasets:
 
 ```{r read-data}
 #| label: read-data
-#| code-fold: false
 
 # Read country results data
 country_results <- read_imo_data(
@@ -89,7 +78,6 @@ Let's create a function to print summary statistics for each dataset:
 
 ```{r summary-function}
 #| label: summary-function
-#| code-fold: false
 
 print_summary <- function(df, name) {
   cat("\nSummary for", name, ":\n")
@@ -106,7 +94,6 @@ Now, let's examine our data:
 
 ```{r initial-summary}
 #| label: initial-summary
-#| code-fold: false
 
 print_summary(country_results, "country_results")
 print_summary(individual_results, "individual_results")
@@ -121,7 +108,6 @@ In this section, we will focus on cleaning the data by handling missing values, 
 
 ```{r handle-missing}
 #| label: handle-missing
-#| code-fold: false
 
 handle_missing <- function(df) {
   df %>%
@@ -136,7 +122,6 @@ individual_results <- handle_missing(individual_results)
 
 ```{r remove-duplicates}
 #| label: remove-duplicates
-#| code-fold: false
 
 country_results <- distinct(country_results)
 individual_results <- distinct(individual_results)
@@ -147,7 +132,6 @@ timeline <- distinct(timeline)
 
 ```{r handle-outliers}
 #| label: handle-outliers
-#| code-fold: false
 
 handle_outliers <- function(x) {
   if (is.numeric(x) && !all(x %% 1 == 0)) {  # Only for non-integer numeric columns
@@ -159,13 +143,12 @@ handle_outliers <- function(x) {
   return(x)
 }
 
-problem_cols_country <- intersect(c("p1", "p2", "p3", "p4", "p5", "p6"), names(country_results))
+problem_cols <- c("p1", "p2", "p3", "p4", "p5", "p6")
 country_results <- country_results %>%
-  mutate(across(all_of(problem_cols_country), handle_outliers))
+  mutate(across(all_of(problem_cols), handle_outliers))
 
-problem_cols_individual <- intersect(c("p1", "p2", "p3", "p4", "p5", "p6", "total"), names(individual_results))
 individual_results <- individual_results %>%
-  mutate(across(all_of(problem_cols_individual), handle_outliers))
+  mutate(across(c(all_of(problem_cols), "total"), handle_outliers))
 ```
 
 ## Data Formatting
@@ -176,15 +159,14 @@ In this section, we will focus on formatting the data by ensuring correct data t
 
 ```{r correct-data-types}
 #| label: correct-data-types
-#| code-fold: false
 
 country_results <- country_results %>%
   mutate(across(c(year, team_size_all, team_size_male, team_size_female,
-                  all_of(problem_cols_country),
+                  all_of(problem_cols),
                   awards_gold, awards_silver, awards_bronze, awards_honorable_mentions), as.integer))
 
 individual_results <- individual_results %>%
-  mutate(across(c(year, all_of(problem_cols_individual), total, individual_rank), as.integer))
+  mutate(across(c(year, all_of(problem_cols), total, individual_rank), as.integer))
 
 timeline <- timeline %>%
   mutate(across(c(edition, year, countries, all_contestant, male_contestant, female_contestant), as.integer))
@@ -194,7 +176,6 @@ timeline <- timeline %>%
 
 ```{r standardize-names}
 #| label: standardize-names
-#| code-fold: false
 
 standardize_names <- function(df) {
   names(df) <- make.names(tolower(names(df)), unique = TRUE)
@@ -210,7 +191,6 @@ timeline <- standardize_names(timeline)
 
 ```{r date-format}
 #| label: date-format
-#| code-fold: false
 
 timeline <- timeline %>%
   mutate(
@@ -225,7 +205,6 @@ Let's check the year ranges in our datasets to ensure consistency:
 
 ```{r consistency-check}
 #| label: consistency-check
-#| code-fold: false
 
 year_ranges <- data.frame(
   Dataset = c("country_results", "individual_results", "timeline"),
@@ -246,7 +225,6 @@ Let's take a final look at our cleaned datasets:
 
 ```{r final-summary}
 #| label: final-summary
-#| code-fold: false
 
 print_summary(country_results, "cleaned country_results")
 print_summary(individual_results, "cleaned individual_results")
@@ -259,17 +237,16 @@ Finally, we'll save our cleaned and formatted datasets:
 
 ```{r save-data}
 #| label: save-data
-#| code-fold: false
 
 # Create DataCleanAndFormatted directory
 dir.create("DataCleanAndFormatted", showWarnings = FALSE)
 
-# Save cleaned CSV files
+# Save as CSV
 write_csv(country_results, "DataCleanAndFormatted/cleaned_country_results.csv")
 write_csv(individual_results, "DataCleanAndFormatted/cleaned_individual_results.csv")
 write_csv(timeline, "DataCleanAndFormatted/cleaned_timeline.csv")
 
-# Save formatted RDS files
+# Save as RDS
 saveRDS(country_results, "DataCleanAndFormatted/formatted_country_results.rds")
 saveRDS(individual_results, "DataCleanAndFormatted/formatted_individual_results.rds")
 saveRDS(timeline, "DataCleanAndFormatted/formatted_timeline.rds")
@@ -279,14 +256,15 @@ print("Data cleaning and formatting completed. Please check the generated files 
 
 ## Conclusion
 
-In this document, we have meticulously walked through the process of cleaning and formatting the International Mathematical Olympiad (IMO) datasets. Our approach was divided into two main phases: data cleaning and data formatting.
+In this document, we have meticulously walked through the process of cleaning and formatting the International Mathematical Olympiad (IMO) datasets. Our approach encompassed a comprehensive set of data preprocessing techniques, ensuring that the resulting datasets are clean, consistent, and well-structured for further analysis.
 
-In the data cleaning phase, we focused on improving the quality and integrity of the data. This included handling missing values through median imputation for numeric columns, which helped preserve the overall distribution of the data. We removed duplicate entries to ensure data uniqueness and addressed potential outliers in score columns using the Interquartile Range (IQR) method. This approach struck a balance between maintaining data integrity and respecting the unique nature of competition scores.
+We began by importing the data directly from the GitHub repository of Deliverable #1, ensuring that we're working with the most up-to-date raw data. We then systematically addressed various data quality issues, including handling missing values, removing duplicates, and addressing potential outliers.
 
-The data formatting phase concentrated on standardizing the structure and presentation of the data. We ensured that all columns adhered to their correct data types as specified in the data dictionary, which is crucial for accurate analysis. Variable names were standardized across all datasets to maintain consistency and improve readability. In the timeline dataset, we paid special attention to date formats, ensuring temporal consistency which is vital for time-based analyses.
+In the formatting phase, we ensured that all columns adhered to their correct data types, standardized variable names across all datasets, and ensured temporal consistency in the timeline dataset.
 
-Throughout both phases, we performed data consistency checks, with a particular focus on aligning year ranges across all three datasets. This step was crucial in validating the coherence of our data across different perspectives of the IMO competitions.
+Throughout the process, we performed data consistency checks, with a particular focus on aligning year ranges across all three datasets. This step was crucial in validating the coherence of our data across different perspectives of the IMO competitions.
 
-The final step involved saving the cleaned and formatted data, preparing it for future analysis. This comprehensive process has not only prepared our IMO data for more in-depth analysis but also enhanced our understanding of the datasets' characteristics and potential challenges. The resulting datasets now provide a solid foundation for exploring trends, patterns, and insights in International Mathematical Olympiad performances over the years.
+The final step involved saving both cleaned (CSV) and formatted (RDS) versions of our datasets, preparing them for future analysis. This comprehensive process has not only prepared our IMO data for more in-depth analysis but also enhanced our understanding of the datasets' characteristics and potential challenges.
 
-By clearly separating the cleaning and formatting steps, we've created a more structured and transparent data preprocessing workflow. This approach not only improves the clarity of our process but also allows for easier modifications or enhancements to specific aspects of data preparation in the future.
+The resulting datasets now provide a solid foundation for exploring trends, patterns, and insights in International Mathematical Olympiad performances over the years.
+
